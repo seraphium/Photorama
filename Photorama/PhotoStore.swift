@@ -6,7 +6,16 @@
 //  Copyright © 2016年 Jackie Zhang. All rights reserved.
 //
 
-import Foundation
+import UIKit
+
+enum ImageResult {
+    case Success(UIImage)
+    case Failure(ErrorType)
+}
+
+enum PhotoError:ErrorType {
+    case ImageCreationError
+}
 
 class PhotoStore {
     let session: NSURLSession = {
