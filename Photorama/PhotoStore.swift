@@ -26,13 +26,13 @@ class PhotoStore {
         let request = NSURLRequest(URL: url)
         let task = session.dataTaskWithRequest(request) {
             (data, response, error) -> Void in
-           /* do {
+            do {
                 let jsonObject = try NSJSONSerialization.JSONObjectWithData(data!, options: [])
                 print (jsonObject)
 
             }  catch let error {
                 print(error)
-            }*/
+            }
             
             let result = self.processRecentPhotosRequest(data: data, error: error)
             completion(result)

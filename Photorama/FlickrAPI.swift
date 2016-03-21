@@ -100,14 +100,15 @@ struct FlickrAPI {
             photoID =  json["id"] as? String,
             title = json["title"] as? String,
           //  dateString = json["datetaken"] as? String,
-           // photoURLString = json["url_h"] as? String,
-          //  url = NSURL(string: photoURLString),
             //dateTaken = dateFormatter.dateFromString(dateString)
             dateTaken :NSDate = NSDate(),
-            url : NSURL = NSURL(string: "www.xx.com")
+            farm = json["farm"] as? Int,
+            server = json["server"] as? String,
+            secret = json["secret"] as? String
             else {
                 return nil
         }
-        return Photo(title: title, photoID: photoID, remoteURL: url, dateTaken: dateTaken)
+        let url = NSURL(string:"https://farm\(farm).staticflickr.com/\(server)/\(photoID)_\(secret).jpg")
+        return Photo(title: title, photoID: photoID, remoteURL: url!, dateTaken: dateTaken)
     }
 }
