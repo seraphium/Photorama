@@ -99,10 +99,12 @@ struct FlickrAPI {
         guard let
             photoID =  json["id"] as? String,
             title = json["title"] as? String,
-            dateString = json["datetaken"] as? String,
-            photoURLString = json["url_h"] as? String,
-            url = NSURL(string: photoURLString),
-            dateTaken = dateFormatter.dateFromString(dateString)
+          //  dateString = json["datetaken"] as? String,
+           // photoURLString = json["url_h"] as? String,
+          //  url = NSURL(string: photoURLString),
+            //dateTaken = dateFormatter.dateFromString(dateString)
+            dateTaken :NSDate = NSDate(),
+            url : NSURL = NSURL(string: "www.xx.com")
             else {
                 return nil
         }
