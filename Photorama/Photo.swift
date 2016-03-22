@@ -8,7 +8,7 @@
 
 import UIKit
 
-class Photo : Equatable {
+class Photo {
     let title: String
     let remoteURL : NSURL
     let photoID : String
@@ -21,6 +21,8 @@ class Photo : Equatable {
         self.dateTaken = dateTaken
     }
 }
+
+extension Photo: Equatable {}
 
 func == (lhs: Photo, rhs: Photo) -> Bool {
     return lhs.photoID == rhs.photoID

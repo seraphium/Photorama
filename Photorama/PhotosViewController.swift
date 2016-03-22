@@ -52,7 +52,7 @@ class PhotosViewController : UIViewController, UICollectionViewDelegate {
                 //when request finished, only update image if still visible
                 if let cell = self.collectionView.cellForItemAtIndexPath(photoIndexPath)
                 as? PhotoCollectionViewCell {
-                    cell.updateWithImage(photo.image)
+                    cell.updateImage(photo.image)
                 }
             }
         }
