@@ -38,6 +38,7 @@ class PhotoStore {
         let request = NSURLRequest(URL: url)
         let task = session.dataTaskWithRequest(request) {
             (data, response, error) -> Void in
+            //debug output
             do {
                 let jsonObject = try NSJSONSerialization.JSONObjectWithData(data!, options: [])
                 print (jsonObject)
@@ -45,8 +46,15 @@ class PhotoStore {
             }  catch let error {
                 print(error)
             }
-            
-            let result = self.processRecentPhotosRequest(data: data, error: error)
+            //process photo request
+            var result = self.processRecentPhotosRequest(data: data, error: error)
+            if case let .success(photos) = result {
+                do {
+                    try self.coreDataStack.saveChanges()
+                } catch let error {
+                    result = .failure(error)
+                }
+            }
             completion(result)
         }
         task.resume()
