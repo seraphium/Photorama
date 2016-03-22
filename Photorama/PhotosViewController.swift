@@ -11,33 +11,28 @@ import UIKit
 
 class PhotosViewController : UIViewController {
     
-    @IBOutlet var imageView : UIImageView!
+    @IBOutlet var collectionView : UICollectionView!
     var store: PhotoStore!
+    let photoDataSource = PhotoDataSource()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        collectionView.dataSource = photoDataSource
+
         store.fetchRecentPhotos() {
             (photosResult) -> Void in
-            
-            switch(photosResult) {
-            case let .success(photos) :
-                print("successfully found \(photos.count) recent photos")
-                if let firstPhoto = photos.first {
-                    self.store.fetchImageForPhoto(firstPhoto) {
-                        (imageResult) -> Void in
-                        switch imageResult {
-                        case let .Success(image):
-                            NSOperationQueue.mainQueue().addOperationWithBlock({
-                                self.imageView.image = image
-                            })
-                        case let .Failure(error):
-                            print ("Error downloading image :\(error)")
-                        }
-                    }
+            NSOperationQueue.mainQueue().addOperationWithBlock() {
+                switch photosResult {
+                case let .success(photos):
+                    print ("success found \(photos.count) recent photos")
+                    self.photoDataSource.photos = photos
+                case let .failure(error):
+                    self.photoDataSource.photos.removeAll()
+                    print ("error fetching recent photos: \(error)")
                 }
-            case let .failure(error) :
-                print("Error fetching recent photos: \(error)")
+                self.collectionView.reloadSections(NSIndexSet(index:0))
             }
+            
         }
     }
 }
