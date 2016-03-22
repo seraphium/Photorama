@@ -9,7 +9,7 @@
 import UIKit
 
 
-class PhotosViewController : UIViewController {
+class PhotosViewController : UIViewController, UICollectionViewDelegate {
     
     @IBOutlet var collectionView : UICollectionView!
     var store: PhotoStore!
@@ -18,7 +18,8 @@ class PhotosViewController : UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.dataSource = photoDataSource
-
+        collectionView.delegate = self
+        
         store.fetchRecentPhotos() {
             (photosResult) -> Void in
             NSOperationQueue.mainQueue().addOperationWithBlock() {
@@ -35,4 +36,26 @@ class PhotosViewController : UIViewController {
             
         }
     }
+    
+    func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
+        let photo = photoDataSource.photos[indexPath.row]
+        
+        //download photo which takes some time
+        store.fetchImageForPhoto(photo) {
+            (result) -> Void in
+            NSOperationQueue.mainQueue().addOperationWithBlock() {
+                //the index path may changed during request start and end ,
+                //so find the most recent index path
+                let photoIndex = self.photoDataSource.photos.indexOf(photo)!
+                let photoIndexPath = NSIndexPath(forRow: photoIndex, inSection: 0)
+                
+                //when request finished, only update image if still visible
+                if let cell = self.collectionView.cellForItemAtIndexPath(photoIndexPath)
+                as? PhotoCollectionViewCell {
+                    cell.updateWithImage(photo.image)
+                }
+            }
+        }
+    }
+    
 }
