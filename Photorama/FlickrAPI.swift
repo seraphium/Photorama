@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreData
 
 enum Method :String {
     case RecentPhotos = "flickr.photos.getRecent"
@@ -64,7 +65,7 @@ struct FlickrAPI {
         return flickrURL(method: .RecentPhotos, parameters: ["extra":"url_h,date_taken"])
     }
     
-    static func photosFromJSONData(data: NSData) -> PhotosResult {
+    static func photosFromJSONData(data: NSData, inContext context: NSManagedObjectContext) -> PhotosResult {
         do {
             let jsonObject : AnyObject = try NSJSONSerialization.JSONObjectWithData(data, options: [])
             
@@ -79,7 +80,7 @@ struct FlickrAPI {
             var finalPhotos = [Photo]()
 
             for photoJSON in photosArray {
-                if let photo = photosFromJSONObject(photoJSON) {
+                if let photo = photosFromJSONObject(photoJSON, inContext: context) {
                     finalPhotos.append(photo)
                 }
             }
@@ -95,7 +96,7 @@ struct FlickrAPI {
         }
     }
     
-    static func photosFromJSONObject(json: [String:AnyObject]) -> Photo? {
+    static func photosFromJSONObject(json: [String:AnyObject], inContext context: NSManagedObjectContext) -> Photo? {
         guard let
             photoID =  json["id"] as? String,
             title = json["title"] as? String,
@@ -104,11 +105,21 @@ struct FlickrAPI {
             dateTaken :NSDate = NSDate(),
             farm = json["farm"] as? Int,
             server = json["server"] as? String,
-            secret = json["secret"] as? String
+            secret = json["secret"] as? String,
+            url = NSURL(string:"https://farm\(farm).staticflickr.com/\(server)/\(photoID)_\(secret).jpg")
             else {
                 return nil
         }
-        let url = NSURL(string:"https://farm\(farm).staticflickr.com/\(server)/\(photoID)_\(secret).jpg")
-        return Photo(title: title, photoID: photoID, remoteURL: url!, dateTaken: dateTaken)
+        var photo: Photo!
+        context.performBlockAndWait() {
+            photo = NSEntityDescription.insertNewObjectForEntityForName("Photo", inManagedObjectContext: context) as! Photo
+            photo.title = title
+            photo.photoID = photoID
+            photo.dateTaken = dateTaken
+            photo.remoteURL = url
+        }
+        
+        return photo
+        
     }
 }
