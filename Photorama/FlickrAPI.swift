@@ -110,6 +110,21 @@ struct FlickrAPI {
             else {
                 return nil
         }
+        let fetchRequest = NSFetchRequest(entityName: "Photo")
+        let predicate = NSPredicate(format: "photoID == \(photoID)")
+        fetchRequest.predicate = predicate
+        
+        var fetchedPhoto : [Photo]!
+        context.performBlockAndWait() {
+            fetchedPhoto = try! context.executeFetchRequest(fetchRequest) as! [Photo]
+        }
+        
+        if fetchedPhoto.count > 0  {
+            print("already has photo in memory , loaded from memory: \(fetchedPhoto.first?.photoID)")
+            return fetchedPhoto.first
+        }
+        
+        
         var photo: Photo!
         context.performBlockAndWait() {
             photo = NSEntityDescription.insertNewObjectForEntityForName("Photo", inManagedObjectContext: context) as! Photo
