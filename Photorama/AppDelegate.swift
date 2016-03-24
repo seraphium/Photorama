@@ -12,14 +12,18 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    
+    public static let applicationDocumentsDirectory : NSURL = {
+        let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
+        return urls.first!
+    }()
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
         let rootViewController = window!.rootViewController as! UINavigationController
         let photosViewController = rootViewController.topViewController as! PhotosViewController
         photosViewController.store = PhotoStore()
-        
+        print(AppDelegate.applicationDocumentsDirectory)
         
         return true
     }
