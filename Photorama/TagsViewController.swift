@@ -10,7 +10,7 @@ import UIKit
 import CoreData
 
 
-class TagsViewController : UITableViewController, UITableViewDelegate {
+class TagsViewController : UITableViewController {
     var store: PhotoStore!
     var photo: Photo!
     var selectedIndexPaths = [NSIndexPath]()

@@ -42,8 +42,30 @@ class CoreDataStack {
         return moc
     }()
     
+    lazy var privateQueueContext : NSManagedObjectContext = {
+        let moc = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
+        moc.parentContext = self.mainQueueContext
+        moc.name = "Private Queue Context"
+        return moc
+    }()
+    
     func saveChanges() throws {
         var error: ErrorType?
+        
+        privateQueueContext.performBlockAndWait() {
+            if self.privateQueueContext.hasChanges {
+                do {
+                    try self.privateQueueContext.save()
+                } catch let saveError {
+                    error = saveError
+                }
+            }
+        }
+        
+        if let error = error {
+            throw error
+        }
+        
         mainQueueContext.performBlockAndWait() {
             if self.mainQueueContext.hasChanges {
                 do {
